@@ -226,7 +226,7 @@ class Film extends Model{
 	public function jaquetteURL($size='small', $fallback=false){
 
 		$media = $this->get('media');
-		if(empty($media)) return false;
+		if(empty($media)) return $fallback;
 
 		$media = array_filter($media, function($e){
 			if($e['poster'] && $e['main']) return $e;
