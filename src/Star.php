@@ -4,8 +4,6 @@ namespace YoVideo;
 
 class Star extends Model{
 
-	static $imageDefault = '/vendor/yovideo/api/assets/img/star/_generic.jpg';
-
 	public function  __construct($data = array()){
 		if(!empty($data)) $this->set($data);
 		parent::__construct();
@@ -321,22 +319,22 @@ class Star extends Model{
 		return $url;
 	}
 
-	public function portraitURL($size='small'){
+	public function portraitURL($size='small', $fallback=false){
 
 		$media = $this->get('media');
-		if(empty($media)) return self::$imageDefault;
+		if(empty($media)) return $fallback;
 
 		$media = array_filter($media, function($e){
 			if($e['poster'] && $e['main']) return $e;
 		});
 
-		if(empty($media)) return self::$imageDefault;
+		if(empty($media)) return $fallback;
 
 		// Remet l'Array dans le bon ordre
 		$media = array_values($media);
 
 		$image = new Media($media[0], $size);
-		$image->fallback(self::$imageDefault);
+		$image->fallback($fallback);
 
 		return $image->url();
 	}

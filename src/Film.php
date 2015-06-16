@@ -4,19 +4,8 @@ namespace YoVideo;
 
 class Film extends Model{
 
-	static $imageDefault = '/vendor/yovideo/api/assets/img/film/_generic.jpg';
-
 	public function  __construct($data = array()){
-
-		/*$this->setModel([
-			'hello'  => 'String',
-			'number' => 'Integer',
-		#	'prop'   => ['k' => 'String', 'v' => 'String'],
-			'stars'  => [['type' => '\YoVideo\Star']]
-		]);*/
-
 		if(!empty($data)) $this->set($data);
-
 		parent::__construct();
 	}
 
@@ -234,10 +223,10 @@ class Film extends Model{
 		return $this->htmlLink($label, $url, $opt);
 	}
 
-	public function jaquetteURL($size='small'){
+	public function jaquetteURL($size='small', $fallback=false){
 
 		$media = $this->get('media');
-		if(empty($media)) return self::$imageDefault;
+		if(empty($media)) return false;
 
 		$media = array_filter($media, function($e){
 			if($e['poster'] && $e['main']) return $e;
@@ -246,10 +235,10 @@ class Film extends Model{
 		// Remet l'Array dans le bon ordre
 		$media = array_values($media);
 
-		if(empty($media)) return self::$imageDefault;
+		if(empty($media)) return $fallback;
 
 		$image = new Media($media[0]);
-		$image->fallback(self::$imageDefault);
+		$image->fallback($fallback);
 		$image->size($size);
 
 		return $image->url();
