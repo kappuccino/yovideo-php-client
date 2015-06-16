@@ -129,7 +129,7 @@ class Tools{
 
 		// Si on donne une date au formate 'YYYY-MM-DD'
 		if(strpos($d, '-') !== false){
-			$d = (new DateTime($d))->getTimestamp();
+			$d = (new \DateTime($d))->getTimestamp();
 		}
 
 		return utf8_encode(strftime($f, $d));
