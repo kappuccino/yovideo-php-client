@@ -1,0 +1,27 @@
+{
+	"name": "yovideo/api",
+	"version": "0.0.1",
+	"description": "PHP Client for YoVideo API.",
+	"minimum-stability": "stable",
+	"license": "proprietary",
+	"authors": [
+		{
+			"name": "Benjamin Mosnier",
+			"email": "bm@kappuccino.org"
+		}
+	],
+	"require": {
+			"php": ">=5.5.0",
+			"phpunit/phpunit": "4.2.*",
+			"guzzlehttp/guzzle": "~5.0",
+			"mandrill/mandrill": "1.0.*",
+			"videlalvaro/php-amqplib": "2.2.*"
+	}
+
+	"autoload": {
+		"psr-4": {
+			"YoVideo\\" : "src/"
+		}
+	}
+
+}
