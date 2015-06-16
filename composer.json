@@ -1,6 +1,6 @@
 {
 	"name": "yovideo/api",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "PHP Client for YoVideo API.",
 	"minimum-stability": "stable",
 	"license": "proprietary",
