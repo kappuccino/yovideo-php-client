@@ -16,8 +16,7 @@
 			"guzzlehttp/guzzle": "~5.0",
 			"mandrill/mandrill": "1.0.*",
 			"videlalvaro/php-amqplib": "2.2.*"
-	}
-
+	},
 	"autoload": {
 		"psr-4": {
 			"YoVideo\\" : "src/"
