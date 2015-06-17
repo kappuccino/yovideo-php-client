@@ -77,16 +77,16 @@ class Request{
 		// Indiquer à l'API qu'on souhaite que le résultat soit mit en cache
 		/*if($this->useCache()){
 			if(!is_array($options['headers'])) $options['headers'] = [];
-
 			$options['headers']['X-Cache'] = 'YES';
 		}*/
 
 	#	Tools::pre($url, $options);
 
 		// Si l'on veut de la cache, on la demande a WP (redis)
+	#	Tools::pre('useCache()', var_export($this->useCache()));
 		if($this->useCache()){
 		//	$found = false;
-			Tools::pre("CACHE ", $url, $options, $cacheKey);
+	#		Tools::pre("CACHE ", $url, $options, $cacheKey);
 			$cached = wp_cache_get($cacheKey, 'yoapi');
 			if($cached !== false) $out = $this->cacheUnserialize($cached);
 		}
@@ -97,7 +97,6 @@ class Request{
 
 			// Si je dois faire le travail
 			try {
-				#	Tools::pre($options);
 				$data = $this->rest->$verb($url, $options);
 
 			} catch (\Exception $e) {
@@ -122,6 +121,9 @@ class Request{
 			}
 
 			// Mettre en cache si tout va bien
+	#		var_dump($code);
+	#		var_dump($this->useCache());
+
 			if($code == 200 && $this->useCache()){
 				$cached = $this->cacheSerialize($out);
 
@@ -130,6 +132,8 @@ class Request{
 				);*/
 
 				wp_cache_set($cacheKey, $cached, 'yoapi', $this->cacheTTL());
+
+	#			Tools::pre("CACHE SET", $cacheKey, microtime(true) - $now);
 			}
 
 	#		Tools::pre("CACHE SET", $cacheKey, microtime(true) - $now);
@@ -139,7 +143,6 @@ class Request{
 
 	#	Tools::pre(Tools::memoryUsage());
 
-	#	die();
 		return $out;
 	}
 

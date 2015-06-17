@@ -9,9 +9,9 @@ class Model extends YoVideo{
 	private $data = [];
 	private $total = 0;
 
-	private $ttl;
-	private $useCache = false;
-	private $defaultTTL = 86400; // 1j par défaut
+#	private $ttl;
+#	private $useCache = false;
+#	private $defaultTTL = 86400; // 1j par défaut
 
 	/**
 	 * Allow to affect $value to $this->data with $name as key (model verified)
@@ -270,14 +270,14 @@ class Model extends YoVideo{
 	}
 
 	public function useCache($use=NULL){
-		if(func_num_args() == 0) return $this->useCache;
-		$this->useCache = (bool) $use;
+		if(func_num_args() == 0) return $this->request->useCache();
+		$this->request->useCache((bool) $use);
 		return $this;
 	}
 
 	public function cacheTTL($ttl=NULL){
-		if(func_num_args()) return $this->ttl ?: $this->defaultTTL;
-		$this->ttl = $ttl;
+		if(func_num_args()) return $this->request->ttl();
+		$this->request->ttl($ttl);
 		return $this;
 	}
 
