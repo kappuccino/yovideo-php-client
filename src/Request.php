@@ -72,13 +72,7 @@ class Request{
 		$out = false;
 		$cacheKey = $this->cacheMakeKey($url, $options);
 
-#		Tools::pre("REQUEST", $verb, $url, $opt);
-
-		// Pas de cache quand on est connecté !
-		/*if($this->useCache()){
-			$user = new User();
-			if($user->isLogged()) $this->useCache(false);
-		}*/
+	#	Tools::pre("REQUEST", $verb, $url, $opt, var_export($this->useCache()));
 
 		// Indiquer à l'API qu'on souhaite que le résultat soit mit en cache
 		/*if($this->useCache()){
@@ -92,14 +86,14 @@ class Request{
 		// Si l'on veut de la cache, on la demande a WP (redis)
 		if($this->useCache()){
 		//	$found = false;
-#			Tools::pre("CACHE ", $url, $options, $cacheKey);
+			Tools::pre("CACHE ", $url, $options, $cacheKey);
 			$cached = wp_cache_get($cacheKey, 'yoapi');
 			if($cached !== false) $out = $this->cacheUnserialize($cached);
 		}
 
 		if(empty($out)){
 
-		#	Tools::pre("NOT IN CACHE", $cacheKey);
+	#		Tools::pre("NOT IN CACHE", $cacheKey);
 
 			// Si je dois faire le travail
 			try {
@@ -138,13 +132,14 @@ class Request{
 				wp_cache_set($cacheKey, $cached, 'yoapi', $this->cacheTTL());
 			}
 
-#			Tools::pre("CACHE SET", $cacheKey, microtime(true) - $now);
+	#		Tools::pre("CACHE SET", $cacheKey, microtime(true) - $now);
 		}else{
-#			Tools::pre("CACHE HITED", $cacheKey, microtime(true)-$now);
+	#		Tools::pre("CACHE HITED", $cacheKey, microtime(true)-$now);
 		}
 
 	#	Tools::pre(Tools::memoryUsage());
 
+	#	die();
 		return $out;
 	}
 

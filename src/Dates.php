@@ -4,7 +4,7 @@ namespace YoVideo;
 
 class Dates extends Model{
 
-	public function  __construct($data = array()){
+	public function  __construct(){
 		parent::__construct();
 	}
 
