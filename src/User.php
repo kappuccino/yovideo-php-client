@@ -14,7 +14,7 @@ class User extends Model{
 		parent::__construct();
 	}
 
-	public function login($login, $passwd){
+	public function login($login, $passwd, $memo=false){
 
 		$url  = '/user/login';
 		$post = ['login' => $login, 'passwd' => $passwd];
@@ -28,16 +28,25 @@ class User extends Model{
 		if($data['user'] && $data['auth']){
 			$_SESSION['yo']['user'] = $data['user'];
 			$_SESSION['yo']['auth'] = $data['auth'];
+
+			if($memo){
+				$config = Config::get();
+				$Crypto = new Crypto();
+				$Crypto->key($config['salt']);
+
+				$crypted = $Crypto->encrypt($data['auth']['_id']);
+				setcookie('yau', $Crypto->iv().'__'.$crypted, time() + (15*86400), '/');
+			}
 		}else{
-			$this->logout();
+			self::logout();
 		}
 
 		return $this;
 	}
 
-	public function logout(){
+	static function logout(){
 		unset($_SESSION['yo']['user'], $_SESSION['yo']['auth']);
-		return $this;
+		setcookie('yau', '', time() - 300, '/');
 	}
 
 	public function create($post){
@@ -79,8 +88,8 @@ class User extends Model{
 		}
 
 		if($data['user'] && $data['auth']){
-			$_SESSION['yo']['user'] = $data['user']['_id'];
-			$_SESSION['yo']['auth'] = $data['auth']['_id'];
+			$_SESSION['yo']['user'] = $data['user'];
+			$_SESSION['yo']['auth'] = $data['auth'];
 		}
 
 		return $this;
@@ -226,9 +235,35 @@ class User extends Model{
 	}
 
 	static function isLogged(){
-		$id = $_SESSION['yo']['user'];
-		if(empty($id)) return false;
-		return true;
+
+		// Session
+		if(!empty($_SESSION['yo']['user'])) return true;
+
+		// Cookie
+		$cookie = $_COOKIE['yau'];
+		if(!empty($cookie)){
+
+			$config = Config::get();
+			$Crypto = new Crypto();
+
+			list($iv, $crypted) = explode('__', $cookie);
+
+			pre($iv, $crypted);
+
+			$Crypto->key($config['salt']);
+			$Crypto->iv($iv);
+
+			$decode = $Crypto->decrypt($crypted);
+
+			$User = new User();
+			$User->connectFromToken($decode);
+
+			if($_SESSION['yo']['auth']['_id'] == $decode){
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public function hasPlaylists(){
