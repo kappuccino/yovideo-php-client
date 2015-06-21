@@ -248,8 +248,6 @@ class User extends Model{
 
 			list($iv, $crypted) = explode('__', $cookie);
 
-			pre($iv, $crypted);
-
 			$Crypto->key($config['salt']);
 			$Crypto->iv($iv);
 

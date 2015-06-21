@@ -51,9 +51,10 @@ class Playlist extends Model{
 		return $this;
 	}
 
-	public function getByUser($id='me'){
+	public function getByUser($id = 'me', Array $params = []){
 
 		$options = [];
+		$params = array_merge(['_user' => $id, 'auto' => false], $params);
 
 		if(empty($id)){
 			throw new Exception('Impossible to get playlist from user with empty `id`');
@@ -72,7 +73,7 @@ class Playlist extends Model{
 			$options = ['headers' => ['Auth' => $user->getAuthId()]];
 		}
 
-		$this->search(['_user' => $id, 'auto' => false], $options);
+		$this->search($params, $options);
 
 		return $this;
 	}

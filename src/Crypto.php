@@ -25,7 +25,7 @@ class Crypto{
 
 	//--
 
-	public function iv($iv){
+	public function iv($iv=NULL){
 		if(func_num_args() == 0) return base64_encode($this->iv);
 		$this->iv = base64_decode($iv);
 		return $this;
