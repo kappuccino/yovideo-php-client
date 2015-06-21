@@ -72,6 +72,26 @@ class User extends Model{
 		return $this;
 	}
 
+	public function update(Array $data){
+
+		$id = $this->getId();
+		if(empty($id)){
+			throw new Exception('Try to update a user with no id');
+		}
+
+		$url = '/user/'.$id;
+
+		try{
+			$data = $this->request->post($url, $data);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+		if(!empty($data)) $this->set($data);
+
+		return $this;
+	}
+
 	public function connectFromToken($token){
 
 		if(!$token){
@@ -227,6 +247,23 @@ class User extends Model{
 
 		return $this;
 	}
+
+	public function getByEmail($email){
+
+		$url  = '/user/email';
+		$data = ['email' => $email];
+
+		try{
+			$data = $this->request->post($url, $data);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+		$this->set($data);
+
+		return $this;
+	}
+
 
 // HELPERS /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
