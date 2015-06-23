@@ -14,6 +14,22 @@ class User extends Model{
 		parent::__construct();
 	}
 
+	public function getBy($field, $value){
+
+		$url  = '/user/by';
+		$post = ['field' => $field, 'value' => $value];
+
+		try{
+			$data = $this->request->post($url, $post);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+		$this->set($data);
+
+		return $this;
+	}
+
 	public function login($login, $passwd, $memo=false){
 
 		$url  = '/user/login';
@@ -115,10 +131,10 @@ class User extends Model{
 		return $this;
 	}
 
-	public function apiExists($email){
+	public function apiExists($field, $value){
 
 		$url  = '/user/exists';
-		$post = ['email' => $email];
+		$post = ['field' => $field, 'value' => $value];
 
 		try{
 			$data = $this->request->post($url, $post);
