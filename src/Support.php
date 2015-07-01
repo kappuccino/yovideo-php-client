@@ -12,15 +12,14 @@ class Support extends Model{
 	public function stats(){
 
 		$url  = '/support/stats';
-		$data = array();
 
 		try{
-			$result = $this->request->get($url);
+			$data = $this->request->get($url);
 		} catch(Exception $e){
 			throw $e;
 		}
 
-		$this->set($result);
+		$this->set($data);
 
 		return $this;
 	}
