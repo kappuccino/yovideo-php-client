@@ -281,5 +281,7 @@ class Model extends YoVideo{
 		return $this;
 	}
 
-
+	public function requestDebug($debug=NULL){
+		return $this->request->debug($debug);
+	}
 }

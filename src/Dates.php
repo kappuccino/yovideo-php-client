@@ -8,9 +8,12 @@ class Dates extends Model{
 		parent::__construct();
 	}
 
+	public function __destruct(){
+		$this->set(NULL);
+	}
+
 	public function search($language, $from, $to, $mode=NULL){
 
-		$out  = ['cine' => [], 'sale' => [], 'rent' => []];
 		$url  = '/dates/'.$language;
 		$get  = ['from' => $from, 'to' => $to];
 

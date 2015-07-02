@@ -14,6 +14,7 @@ class Request{
 	private $version;
 	private $auth;
 	private $ttl;
+	private $debug;
 	private $useCache = false;
 	private $defaultTTL = 86400; // 1j par défaut
 
@@ -63,8 +64,6 @@ class Request{
 	 */
 	private function request($verb, $url, $opt=array()){
 
-	#	Tools::pre(Tools::memoryUsage());
-
 		$now = microtime(true);
 		$url = '/'.$this->version.$url;
 		$options = ['exceptions' => false];
@@ -72,33 +71,29 @@ class Request{
 		$out = false;
 		$cacheKey = $this->cacheMakeKey($url, $options);
 
-	#	Tools::pre("REQUEST", $verb, $url, $opt, var_export($this->useCache()));
+		if($this->debug()){
+			Tools::pre(
+				'>> '.strtoupper($verb).' '.$url, $opt,
+				'useCache() = '.var_export($this->useCache(), true),
+				'cacheKey = '.$cacheKey
+			);
+		}
 
-		// Indiquer à l'API qu'on souhaite que le résultat soit mit en cache
-		/*if($this->useCache()){
-			if(!is_array($options['headers'])) $options['headers'] = [];
-			$options['headers']['X-Cache'] = 'YES';
-		}*/
-
-	#	Tools::pre($url, $options);
+		if($this->debug()) Tools::pre('Memory (before) = '.Tools::memoryUsage());
 
 		// Si l'on veut de la cache, on la demande a WP (redis)
-	#	Tools::pre('useCache()', var_export($this->useCache()));
 		if($this->useCache()){
-		//	$found = false;
-	#		Tools::pre("CACHE ", $url, $options, $cacheKey);
 			$cached = wp_cache_get($cacheKey, 'yoapi');
 			if($cached !== false) $out = $this->cacheUnserialize($cached);
 		}
 
 		if(empty($out)){
 
-	#		Tools::pre("NOT IN CACHE", $cacheKey);
+			if($this->debug()) Tools::pre('NOT IN CACHE, the request will be triggered');
 
 			// Si je dois faire le travail
 			try {
 				$data = $this->rest->$verb($url, $options);
-
 			} catch (\Exception $e) {
 				throw $e;
 			}
@@ -111,37 +106,40 @@ class Request{
 				$out = $data->json();
 			}
 
-			if ($code > 200) {
-
-				if (is_array($out) && NULL !== $out['error']['name']) {
+			if($code > 200){
+				if(is_array($out) && NULL !== $out['error']['name']){
 					throw new Exception($out['error'], $code);
 				}
 
 				throw new Exception('Api Exception', $code);
 			}
 
-			// Mettre en cache si tout va bien
-	#		var_dump($code);
-	#		var_dump($this->useCache());
-
 			if($code == 200 && $this->useCache()){
 				$cached = $this->cacheSerialize($out);
 
-				/*Tools::pre('cache', $cacheKey, strlen($cached), 'ttl='.$this->cacheTTL(), 'date='.date("Y-m-d H:i:s", time()+$this->cacheTTL()),
-					'now='.date("Y-m-d H:i:s")
-				);*/
+				if($this->debug()){
+					Tools::pre(
+						'now= '.date("Y-m-d H:i:s"),
+						'ttl= '.$this->cacheTTL(),
+						'date= '.date("Y-m-d H:i:s", time()+$this->cacheTTL())
+					);
+				}
 
 				wp_cache_set($cacheKey, $cached, 'yoapi', $this->cacheTTL());
 
-	#			Tools::pre("CACHE SET", $cacheKey, microtime(true) - $now);
+				if($this->debug()) Tools::pre('CACHED in '.(microtime(true) - $now).' ms');
+			}else{
+				if($this->debug()) Tools::pre('NOT CACHED because useCache() is false');
 			}
 
-	#		Tools::pre("CACHE SET", $cacheKey, microtime(true) - $now);
 		}else{
-	#		Tools::pre("CACHE HITED", $cacheKey, microtime(true)-$now);
+			if($this->debug()) Tools::pre('CACHE HITED in '.(microtime(true)-$now).' ms');
 		}
 
-	#	Tools::pre(Tools::memoryUsage());
+		if($this->debug()){
+			Tools::pre('Memory (after) = '.Tools::memoryUsage());
+			Tools::pre('Timing is '.(microtime(true)-$now));
+		}
 
 		return $out;
 	}
@@ -237,4 +235,13 @@ class Request{
 		return $this;
 	}
 
+//--
+
+	public function debug($debug=NULL){
+		if(func_num_args() == 0) return $this->debug;
+		#Tools::pre(__FILE__.':'.__LINE__, 'debug= '.var_export($debug, true));
+
+		$this->debug = (bool) $debug;
+		return $this;
+	}
 }
