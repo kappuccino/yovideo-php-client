@@ -110,6 +110,27 @@ class Playlist extends Model{
 		return $this;
 	}
 
+	public function remove(){
+
+		$id = $this->getId();
+
+		// Lever une exception si l'instance de cet objet n'a pas d'ID
+		if(!$id){
+			throw new Exception('Try to remove a playlist with empty `_id` key');
+		}
+
+		$url  = '/playlist/'.$id;
+
+		try{
+			$this->request->delete($url);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+		return $this;
+
+	}
+
 	public function pushFilm($id){
 
 		$pid = $this->getId();
