@@ -269,9 +269,10 @@ class Model extends YoVideo{
 		echo $html;
 	}
 
-	public function useCache($use=NULL){
+	public function useCache($use=NULL, $ttl=NULL){
 		if(func_num_args() == 0) return $this->request->useCache();
 		$this->request->useCache((bool) $use);
+		if($ttl) $this->cacheTTL($ttl);
 		return $this;
 	}
 
