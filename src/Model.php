@@ -277,8 +277,8 @@ class Model extends YoVideo{
 	}
 
 	public function cacheTTL($ttl=NULL){
-		if(func_num_args()) return $this->request->ttl();
-		$this->request->ttl($ttl);
+		if(func_num_args()) return $this->request->cacheTTL();
+		$this->request->cacheTTL($ttl);
 		return $this;
 	}
 
