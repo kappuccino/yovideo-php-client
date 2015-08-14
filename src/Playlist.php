@@ -110,6 +110,26 @@ class Playlist extends Model{
 		return $this;
 	}
 
+	public function update($data){
+
+		$id = $this->get('_id');
+
+		// Lever une exception si on n'a pas d'ID
+		if(empty($id)) throw new Exception('Try to update a playlist with no `_id`');
+
+		$url  = '/playlist/'.$id;
+
+		try{
+			$data = $this->request->post($url, $data);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+		$this->set($data);
+
+		return $this;
+	}
+
 	public function remove(){
 
 		$id = $this->getId();
