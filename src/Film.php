@@ -364,7 +364,7 @@ class Film extends Model{
 
 	public function isSerie(){
 		$isSerie = $this->get('isSerie');
-		return boolval($isSerie);
+		return (bool)$isSerie;
 	}
 
 	/**
