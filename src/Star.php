@@ -368,6 +368,28 @@ class Star extends Model{
 		return ($interval->y > 0) ? $interval->y : false;
 	}
 
+	public function ageInMovie($date){
+
+		// Pas de date pour le film
+		if(empty($date)) return false;
+
+		// Pas de date de naissance
+		$birth = $this->get('birthDate');
+		if(empty($birth)) return false;
+
+		// Erreyr de format de date
+		try{
+			$birth = new \DateTime($birth);
+		} catch (\Exception $e){
+			return false;
+		}
+
+		$film = new \DateTime($date.'-07-08');
+
+		$interval = $birth->diff($film);
+		return ($interval->y > 0) ? $interval->y : false;
+	}
+
 	/**
 	 * Retourne depuis combien d'année cette personne est morte
 	 *
