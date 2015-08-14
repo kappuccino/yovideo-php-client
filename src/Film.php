@@ -362,6 +362,11 @@ class Film extends Model{
 		return !empty($support);
 	}
 
+	public function isSerie(){
+		$isSerie = $this->get('isSerie');
+		return boolval($isSerie);
+	}
+
 	/**
 	 * Rertourne l'URL de la bande annonce pour ce film (trailer principal)
 	 *
