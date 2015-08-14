@@ -162,6 +162,46 @@ class Film extends Model{
 		return $media;
 	}
 
+	/**
+	 * Retourne une liste de Pack qui contient ce Film
+	 *
+	 * @return $this
+	 * @throws Exception
+	 * @throws \Exception
+	 */
+	public function inPack(){
+
+		$url = '/film/'.$this->get('_id').'/pack';
+
+		try{
+			$data = $this->request->get($url);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+
+		if(!empty($data)){
+
+			// Film Object
+			$data = array_map(function($e){
+				return new Film($e);
+			}, $data);
+
+			// Order by date DESC
+			usort($data, function($a, $b){
+				$a = $a->get('date');
+				$b = $b->get('date');
+				if ($a == $b) return 0;
+				return ($a < $b) ? -1 : 1;
+			});
+
+			// Injection
+			$this->set('inPack_', $data, false);
+		}
+
+		return $this;
+	}
+
 
 // HELPERS /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
