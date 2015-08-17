@@ -34,15 +34,6 @@ class Star extends Model{
 			throw $e;
 		}
 
-		// Construir des Film d'après la filmo
-		/*if(!empty($data['filmo'])){
-			foreach($data['filmo'] as $job => $films){
-				foreach($films as $n => $film){
-					$data['filmo'][$job][$n] = new Film($film);
-				}
-			}
-		}*/
-
 		$this->set($data);
 
 		return $this;
