@@ -116,6 +116,13 @@ class Film extends Model{
 		return $data;
 	}
 
+	public function statsCount($type){
+		$stats = $this->get('stats');
+		if(empty($stats)) return 0;
+		if(!in_array($type, $stats)) return 0;
+		return $stats[$type];
+	}
+
 	/**
 	 * Retourne les données de la locale courante
 	 *

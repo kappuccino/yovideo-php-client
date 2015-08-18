@@ -280,6 +280,59 @@ class User extends Model{
 		return $this;
 	}
 
+	public function getFeeling(){
+
+		$id = $this->getUserId();
+
+		if(!$id) throw new Exception('Try to get user feeling with no user id');
+
+		$url = '/user/'.$id.'/feeling';
+
+		try{
+			$data = $this->request->get($url);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+		$this->set('feeling_', $data, false);
+
+		return $this;
+	}
+
+	public function feel($type, $id, $feeling){
+
+		$id = $this->getUserId();
+
+		if(!$id) throw new Exception('Try to set a feeling with no user id');
+
+		$url = '/user/'.$id.'/feel/'.$type.'/'.$id.'/'.$feeling;
+
+		try{
+			$data = $this->request->get($url);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+		return $data;
+	}
+
+	public function unfeel($type, $id, $feeling){
+
+		$id = $this->getUserId();
+
+		if(!$id) throw new Exception('Try to set a feeling with no user id');
+
+		$url = '/user/'.$id.'/unfeel/'.$type.'/'.$id.'/'.$feeling;
+
+		try{
+			$data = $this->request->get($url);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+		return $data;
+	}
+
 
 // HELPERS /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
