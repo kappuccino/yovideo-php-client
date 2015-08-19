@@ -73,4 +73,11 @@ class Dates extends Model{
 		return date('Y-m-d', strtotime($str));
 	}
 
+	public function nextTuesday($more=NULL){
+		$str = 'next Tuesday';
+		if($more) $str .= ' '.$more;
+
+		return date('Y-m-d', strtotime($str));
+	}
+
 }
