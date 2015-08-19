@@ -301,11 +301,10 @@ class User extends Model{
 
 	public function feel($type, $id, $feeling){
 
-		$id = $this->getUserId();
+		$uid = $this->getUserId();
+		if(!$uid) throw new Exception('Try to set a feeling with no user id');
 
-		if(!$id) throw new Exception('Try to set a feeling with no user id');
-
-		$url = '/user/'.$id.'/feel/'.$type.'/'.$id.'/'.$feeling;
+		$url = '/user/'.$uid.'/feel/'.$type.'/'.$id.'/'.$feeling;
 
 		try{
 			$data = $this->request->get($url);
@@ -318,11 +317,10 @@ class User extends Model{
 
 	public function unfeel($type, $id, $feeling){
 
-		$id = $this->getUserId();
+		$uid = $this->getUserId();
+		if(!$uid) throw new Exception('Try to set a feeling with no user id');
 
-		if(!$id) throw new Exception('Try to set a feeling with no user id');
-
-		$url = '/user/'.$id.'/unfeel/'.$type.'/'.$id.'/'.$feeling;
+		$url = '/user/'.$uid.'/unfeel/'.$type.'/'.$id.'/'.$feeling;
 
 		try{
 			$data = $this->request->get($url);
