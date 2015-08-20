@@ -331,6 +331,40 @@ class User extends Model{
 		return $data;
 	}
 
+	public function rate($type, $id, $rate){
+
+		$uid = $this->getUserId();
+		if(!$uid) throw new Exception('Try to set a rate with no user id');
+
+		$url = '/user/'.$uid.'/rate/'.$type.'/'.$id.'/'.$rate;
+
+		try{
+			$data = $this->request->get($url);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+		return $data;
+	}
+
+	public function unrate($type, $id){
+
+		$uid = $this->getUserId();
+		if(!$uid) throw new Exception('Try to unset a rate with no user id');
+
+		$url = '/user/'.$uid.'/unrate/'.$type.'/'.$id;
+
+		echo $url;
+
+		try{
+			$data = $this->request->get($url);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+		return $data;
+	}
+
 
 // HELPERS /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
