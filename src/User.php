@@ -280,13 +280,15 @@ class User extends Model{
 		return $this;
 	}
 
-	public function getFeeling(){
+	public function getFeeling($light=false){
 
 		$id = $this->getUserId();
 
 		if(!$id) throw new Exception('Try to get user feeling with no user id');
 
 		$url = '/user/'.$id.'/feeling';
+
+		if($light) $url .= '?light';
 
 		try{
 			$data = $this->request->get($url);
