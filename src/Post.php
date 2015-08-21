@@ -2,40 +2,13 @@
 
 namespace YoVideo;
 
-class Post extends Model{
+class Post extends PostCollection{
 
 	public function  __construct($data = array()){
 
 		if(!empty($data)) $this->set($data);
 
 		parent::__construct();
-	}
-
-	public function search(Array $post){
-
-		$url  = '/post';
-		$data = array();
-
-		try{
-			$result = $this->request->post($url, $post);
-		} catch(Exception $e){
-			throw $e;
-		}
-
-		$data = $result['data'];
-		$this->setTotal(intval($result['total']));
-
-		if(!empty($data)){
-			foreach($data as $n => $e){
-				$tmp = new Post($e);
-
-				$data[$n] = $tmp;
-			}
-		}
-
-		$this->set($data);
-
-		return $this;
 	}
 
 	public function getById($id){
@@ -51,33 +24,6 @@ class Post extends Model{
 		$this->set($data);
 
 		return $this;
-	}
-
-	public function getByUser($id=NULL){
-
-		if(empty($id)){
-			$user = new User();
-			$id = $user->getUserId();
-		}
-
-		if(empty($id)){
-			throw new Exception('Impossible to get post from user with empty `id`');
-		}
-
-		$this->search(['_user' => $id, 'auto' => false]);
-
-		return $this->get();
-	}
-
-	public function getByPlace($place){
-
-		if(empty($place)){
-			throw new Exception('Impossible to get post from a place with no place ID');
-		}
-
-		$this->search(['place' => $place]);
-
-		return $this->get();
 	}
 
 	public function getReply($id=NULL){
@@ -138,6 +84,18 @@ class Post extends Model{
 		$url = '/fr/post/'.$this->getId();
 		if($full) $url = 'http://'.$_SERVER['HTTP_HOST'].$url;
 		return $url;
+	}
+
+
+	public function getPost(){
+		return $this->get('post');
+	}
+
+	public function getDate($format='%e %B %Y'){
+		$date = $this->get('created');
+		$date = new \DateTime($date);
+		$timestamp = $date->getTimestamp();
+		return strftime($format, $timestamp);
 	}
 
 
