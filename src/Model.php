@@ -285,4 +285,10 @@ class Model extends YoVideo{
 	public function requestDebug($debug=NULL){
 		return $this->request->debug($debug);
 	}
-}
+
+	public function statsCount($type){
+		$stats = $this->get('stats');
+		if(empty($stats)) return 0;
+		if(!in_array($type, $stats)) return 0;
+		return $stats[$type];
+	}}

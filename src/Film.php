@@ -116,13 +116,6 @@ class Film extends Model{
 		return $data;
 	}
 
-	public function statsCount($type){
-		$stats = $this->get('stats');
-		if(empty($stats)) return 0;
-		if(!in_array($type, $stats)) return 0;
-		return $stats[$type];
-	}
-
 	/**
 	 * Retourne les données de la locale courante
 	 *
@@ -703,5 +696,29 @@ class Film extends Model{
 		return 'Plus de 10.000.000';
 
 
+	}
+
+	public function opengraphMeta(){
+/*
+<meta property="og:locale" content="fr_FR" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Blabla titre Facebook" />
+<meta property="og:description" content="qsdqsd" />
+<meta property="og:url" content="http://dev.metiers-presse.org/connaitre-letendue-du-secteur/" />
+<meta property="og:site_name" content="Métiers Presse" />
+*/
+
+		return [];
+	}
+
+	public function twitterMeta(){
+/*
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:description" content="sdfsdfsd"/>
+<meta name="twitter:title" content="Blabla titre twitter"/>
+<meta name="twitter:domain" content="Métiers Presse"/>
+*/
+
+		return [];
 	}
 }

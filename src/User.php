@@ -30,6 +30,36 @@ class User extends Model{
 		return $this;
 	}
 
+	public function getById($id){
+		return $this->getBy('_id', $id);
+	}
+
+	public function getByEmail($email){
+
+		$url  = '/user/email';
+		$data = ['email' => $email];
+
+		try{
+			$data = $this->request->post($url, $data);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+		$this->set($data);
+
+		return $this;
+	}
+
+	public function getMe(){
+
+		$this->setCurrentUser();
+		if(empty($this->user_id)) return false;
+
+		return $this->getById($this->user_id);
+	}
+
+//--
+
 	public function login($login, $passwd, $memo=false){
 
 		$url  = '/user/login';
@@ -145,30 +175,27 @@ class User extends Model{
 		return $data['exists'] ?: false;
 	}
 
-	public function checkEmail($email){
+	public function checkEmail($email, $name){
 
 		$config = Config::get();
 		$sent = false;
 		$link = 'http://'.$_SERVER['HTTP_HOST'].'/fr/user/confirm/'.
-				'?email='.rawurlencode($email);
+				'?email='.rawurlencode($email).'&name='.$name;
 
 		try {
 			$mandrill = new \Mandrill($config['mandrill']['key']);
 
-			$message = array(
+			$message = [
 				'from_email' => 'no-reply@yo-video.com',
-				'from_name'  => 'yovideo',
-				'tags'       => array('yovideo', 'check-email'),
-				'to'         => array(
-					array(
-						'email' => $email,
-						'type'  => 'to'
-					)
-				),
-				'global_merge_vars' => array(
+				'from_name' => 'yovideo',
+				'tags' => ['yovideo', 'check-email'],
+				'to' => [['email' => $email, 'type' => 'to']],
+				'global_merge_vars' => [
 					array('name' => 'link', 'content' => $link),
-				)
-			);
+					array('name' => 'name', 'content' => $name),
+					array('name' => 'email', 'content' => $email)
+				]
+			];
 
 			$result = $mandrill->messages->sendTemplate('yovideo-check-email', [], $message, false, '', '');
 
@@ -243,8 +270,8 @@ class User extends Model{
 	public function setCurrentUser(){
 		$id = $this->getAuthId();
 		if($id){
-			$this->user_id = $id;
-			$this->auth_id = $this->getAuthId();
+			$this->user_id = $this->getUserId();
+			$this->auth_id = $id;
 		}
 	}
 
@@ -264,21 +291,27 @@ class User extends Model{
 		return $this;
 	}
 
-	public function getByEmail($email){
+	public function setName($name){
 
-		$url  = '/user/email';
-		$data = ['email' => $email];
+		$id = $this->getId();
+		if(empty($id)){
+			throw new Exception('Try to update a user with no id');
+		}
+
+		$url = '/user/'.$id;
 
 		try{
-			$data = $this->request->post($url, $data);
+			$data = $this->request->post($url, ['name' => $name]);
 		} catch(Exception $e){
 			throw $e;
 		}
 
-		$this->set($data);
+		if(!empty($data)) $this->set($data);
 
 		return $this;
 	}
+
+//--
 
 	public function getFeeling($light=false){
 
@@ -370,6 +403,7 @@ class User extends Model{
 
 // HELPERS /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 	public function exists(){
 		if($this->exists) return $this->exists;
 	}
@@ -435,6 +469,71 @@ class User extends Model{
 
 	public function getAuthId(){
 		return $_SESSION['yo']['auth']['_id'];
+	}
+
+	public function displayName(){
+		return $this->get('name');
+	}
+
+	/**
+	 * Retourne l'URL complète pour le film
+	 *
+	 * @param bool $full
+	 * @return string
+	 */
+	public function permalink($full=false){
+		$url = '/fr/member/'.$this->getId().'/';
+		if($full) $url = 'http://'.$_SERVER['HTTP_HOST'].$url;
+		return $url;
+	}
+
+	public function subPermalink($sub, $full=false){
+		$url = $this->permalink($full).$sub;
+		return $url;
+	}
+
+	public function htmlLink($label=NULL, $url=NULL, $opt=[]){
+
+		if(empty($label)) $label = $this->displayName();
+
+		$opt = array_merge($opt, [
+			'title' => $this->displayName()
+		]);
+
+		return parent::htmlLink($label, $url ?: $this->permalink(true), $opt);
+	}
+
+
+
+
+	static function isNameValid($name){
+		$valid = false;
+
+		# Format
+		if(preg_match_all('#[a-zA-Z0-9\-\_]+#', $name)) $valid = true;
+
+		# API (email)
+		if($valid){
+			$User = new User();
+			$valid = $User->apiExists('name', $name) === false;
+		}
+
+		return $valid;
+	}
+
+	static function isEmailValid($email){
+		$valid = false;
+
+		# Format
+		$valid = filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+
+		# API
+		if($valid){
+			$User = new User();
+			$valid = $User->apiExists('email', $email) === false;
+		}
+
+		return $valid;
 	}
 
 }
