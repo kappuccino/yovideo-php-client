@@ -503,8 +503,28 @@ class User extends Model{
 		return parent::htmlLink($label, $url ?: $this->permalink(true), $opt);
 	}
 
+	public function avatarURL($size='small', $fallback=false){
 
+		$media = $this->get('media');
+		if(empty($media)) return $fallback;
 
+		$media = array_filter($media, function($e){
+			if($e['main']) return $e;
+		});
+
+		if(empty($media)) return $fallback;
+
+		// Remet l'Array dans le bon ordre
+		$media = array_values($media);
+
+	#	print_r($media);
+	#	die();
+
+		$image = new Media($media[0], $size);
+		$image->fallback($fallback);
+
+		return $image->url();
+	}
 
 	static function isNameValid($name){
 		$valid = false;
