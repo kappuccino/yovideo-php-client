@@ -43,6 +43,8 @@ class Post extends PostCollection{
 
 		$url  = '/post';
 
+		if(!empty($data['post'])) $data['post'] = stripslashes($data['post']);
+
 		// Ajouter le user à la volée
 		if(!$data['_user']){
 			$user = new User();
@@ -59,6 +61,8 @@ class Post extends PostCollection{
 		} catch(ApiException $e){
 			throw $e;
 		}
+
+		$data['_user'] = new User($data['_user']);
 
 		$this->set($data);
 
@@ -86,11 +90,6 @@ class Post extends PostCollection{
 		return $url;
 	}
 
-
-	public function getPost(){
-		return $this->get('post');
-	}
-
 	public function getDate($format='%e %B %Y'){
 		$date = $this->get('created');
 		$date = new \DateTime($date);
@@ -98,5 +97,29 @@ class Post extends PostCollection{
 		return strftime($format, $timestamp);
 	}
 
+	public function getUser(){
+		return $this->get('_user');
+	}
+
+	public function htmlDisplay(){
+
+		$post = $this->get('post');
+
+		$hash = $this->get('hashtags');
+		if(!empty($hash)){
+			foreach($hash as $e){
+				$post = str_replace('#'.$e, '<a href="#">#'.$e.'</a>', $post);
+			}
+		}
+
+		$users = $this->get('users');
+		if(!empty($users)){
+			foreach($users as $e){
+				$post = str_replace('@'.$e, '<a href="#">@'.$e.'</a>', $post);
+			}
+		}
+
+		return $post;
+	}
 
 }

@@ -27,6 +27,7 @@ class PostCollection extends Model{
 
 		if(!empty($data)){
 			foreach($data as $n => $e){
+				$e['_user'] = new User($e['_user']);
 				$data[$n] = new Post($e);
 			}
 		}
