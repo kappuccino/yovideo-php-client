@@ -96,8 +96,8 @@ class Media{
 		if(empty($this->url) OR $this->notFound) return $this->default;
 
 		$domain = (function_exists('yoOnair') && yoOnair())
-			 ? $this->cloudfront
-			 : $this->bucket;
+			? $this->cloudfront
+			: $this->bucket;
 
 		$etag = ($this->etag)
 			? '?etag='.$this->etag
@@ -123,19 +123,35 @@ class Media{
 		echo $html;
 	}
 
-	public function inject($type, $_id, $file=NULL){
+	public function clean($type, $_id, $prefix){
 
 		$request = new Request();
 
 		try{
-			$data = $request->post('/media/inject', [
-				'url'  => 'http://' . $_SERVER['HTTP_HOST'] . $this->media,
-				'type' => $type,
-				'_id'  => $_id,
-				'file' => $file
+			$data = $request->post('/media/clean', [
+				'type'   => $type,
+				'_id'    => $_id,
+				'prefix' => $prefix
 			]);
-		} catch(Exception $e) {
-			print_r($e);
+		} catch(Exception $e){
+		}
+
+	}
+
+	public function inject($type, $_id, $file=NULL){
+
+		$request = new Request();
+
+		$opt = [
+			'url'  => 'http://' . $_SERVER['HTTP_HOST'] . $this->media,
+			'type' => $type,
+			'_id'  => $_id,
+			'file' => $file
+		];
+
+		try{
+			$data = $request->post('/media/inject', $opt);
+		} catch(Exception $e){
 		}
 
 	}
