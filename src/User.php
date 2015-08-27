@@ -315,7 +315,7 @@ class User extends Model{
 
 	public function getFeeling($light=false){
 
-		$id = $this->getUserId();
+		$id = $this->getId();
 
 		if(!$id) throw new Exception('Try to get user feeling with no user id');
 
@@ -332,6 +332,24 @@ class User extends Model{
 		$this->set('feeling_', $data, false);
 
 		return $this;
+	}
+
+	public function feelingFiltered($feeling){
+
+		$feel = $this->get('feeling_');
+		if(empty($feel)) $this->getFeeling();
+
+		// Devrait être peuplé ou vide
+		$feel = $this->get('feeling_');
+		if(!is_array($feel)) $feel = [];
+
+	    $feel = array_filter($feel, function($e) use ($feeling){
+		    if(array_key_exists($feeling, $e)) return $e[$feeling];
+		    return false;
+		});
+
+
+		return $feel;
 	}
 
 	public function feel($type, $id, $feeling){
@@ -472,7 +490,7 @@ class User extends Model{
 	}
 
 	public function displayName(){
-		return $this->get('name');
+		return '@'.$this->get('name');
 	}
 
 	/**
