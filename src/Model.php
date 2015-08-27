@@ -286,9 +286,9 @@ class Model extends YoVideo{
 		return $this->request->debug($debug);
 	}
 
-	public function statsCount($type){
+	public function statsCount($stat){
 		$stats = $this->get('stats');
 		if(empty($stats)) return 0;
-		if(!in_array($type, $stats)) return 0;
-		return $stats[$type];
+		if(!array_key_exists($stat, $stats)) return 0;
+		return $stats[$stat];
 	}}
