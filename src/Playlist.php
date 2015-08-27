@@ -37,7 +37,7 @@ class Playlist extends Model{
 
 	public function getById($id){
 
-		$url  = '/playlist/'.$id;
+		$url = '/playlist/'.$id;
 
 		try{
 			$data = $this->request->get($url);
@@ -214,7 +214,17 @@ class Playlist extends Model{
 // HELPERS /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public function permalink($full=false){
-		$url = '/fr/playlist/'.$this->getId();
+		$url = '/fr/playlist/'.$this->getId().'/';
+		if($full) $url = 'http://'.$_SERVER['HTTP_HOST'].$url;
+		return $url;
+	}
+
+	public function displayName(){
+		return $this->get('name');
+	}
+
+	public function publicPermalink($full=false){
+		$url = '/fr/member/'.$this->get('_user._id').'/playlist/'.$this->getId().'/';
 		if($full) $url = 'http://'.$_SERVER['HTTP_HOST'].$url;
 		return $url;
 	}
