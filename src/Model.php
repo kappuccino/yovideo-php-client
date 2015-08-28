@@ -291,4 +291,6 @@ class Model extends YoVideo{
 		if(empty($stats)) return 0;
 		if(!array_key_exists($stat, $stats)) return 0;
 		return $stats[$stat];
-	}}
+	}
+
+}

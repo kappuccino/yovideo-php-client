@@ -2,12 +2,9 @@
 
 namespace YoVideo;
 
-class PostCollection extends Model{
+class PostCollection extends Collection{
 
-	public function  __construct($data = array()){
-
-		if(!empty($data)) $this->set($data);
-
+	public function  __construct(){
 		parent::__construct();
 	}
 
@@ -37,7 +34,7 @@ class PostCollection extends Model{
 		return $this;
 	}
 
-	public function getByUser($id=NULL){
+	public function getByUser($id=NULL, $opt=[]){
 
 		if(empty($id)){
 			$user = new User();
@@ -48,7 +45,8 @@ class PostCollection extends Model{
 			throw new Exception('Impossible to get post from user with empty `id`');
 		}
 
-		$this->search(['_user' => $id, 'auto' => false]);
+		$opt = array_merge(['_user' => $id], $opt);
+		$this->search($opt);
 
 		return $this->get();
 	}
