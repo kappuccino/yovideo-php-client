@@ -94,7 +94,7 @@ class Post extends PostCollection{
 		$date = $this->get('created');
 		$date = new \DateTime($date);
 		$timestamp = $date->getTimestamp();
-		return strftime($format, $timestamp);
+		return utf8_encode(strftime($format, $timestamp));
 	}
 
 	public function getUser(){
