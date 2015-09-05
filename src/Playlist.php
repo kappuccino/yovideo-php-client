@@ -70,7 +70,7 @@ class Playlist extends Model{
 				return $this;
 			}
 
-			$options = ['headers' => ['Auth' => $user->getAuthId()]];
+			#$options = ['headers' => ['Auth' => $user->getAuthId()]];
 		}
 
 		$this->search($params, $options);
