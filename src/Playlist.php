@@ -16,6 +16,7 @@ class Playlist extends Model{
 		$url  = '/playlist';
 
 		try{
+		#	pre($url, $post, $options);
 			$result = $this->request->post($url, $post, $options);
 		} catch(Exception $e){
 			throw $e;
@@ -53,7 +54,7 @@ class Playlist extends Model{
 
 	public function getByUser($id = 'me', Array $params = []){
 
-		$options = [];
+		#$options = [];
 		$params = array_merge(['_user' => $id, 'auto' => false], $params);
 
 		if(empty($id)){
@@ -70,10 +71,12 @@ class Playlist extends Model{
 				return $this;
 			}
 
+			$params['_user'] = $user->getUserId();
+
 			#$options = ['headers' => ['Auth' => $user->getAuthId()]];
 		}
 
-		$this->search($params, $options);
+		$this->search($params); //, $options);
 
 		return $this;
 	}
