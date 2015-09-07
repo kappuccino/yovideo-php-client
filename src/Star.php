@@ -470,13 +470,11 @@ class Star extends Model{
 			throw $e;
 		}
 
-
 		// Trier les stars en fonction de la moyenne de leur film
 		$Result = $Search->get();
 		$field  = 'score.avg';
 		usort($Result, function ($a, $b) use ($field) {
-			if ($a->get($field) == $b->get($field)) return 0;
-
+			if($a->get($field) == $b->get($field)) return 0;
 			return $a->get($field) < $b->get($field) ? 1 : -1;
 		});
 
