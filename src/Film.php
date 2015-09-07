@@ -408,11 +408,12 @@ class Film extends Model{
 		$times = [];
 		$support = $this->get('support');
 
-		$to = new \DateTime($to);
+		$from = is_a($from, 'DateTime') ? $from : new \DateTime($from);
+		$from = $from->getTimestamp();
+
+		$to = is_a($to, 'DateTime') ? $to : new \DateTime($to);
 		$to = $to->getTimestamp();
 
-		$from = new \DateTime($from);
-		$from = $from->getTimestamp();
 
 		foreach($support as $e){
 			$time = 0;
