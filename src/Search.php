@@ -61,6 +61,21 @@ class Search extends Model{
 		return $this;
 	}
 
+	public function search(Array $post){
+
+		$url = '/search/search';
+
+		try{
+			$result = $this->request->post($url, $post);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+		$this->set($result);
+
+		return $this;
+	}
+
 	//--
 
 	function matchSupport(){
