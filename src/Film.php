@@ -343,11 +343,12 @@ class Film extends Model{
 		$media = $this->get('media');
 		if(empty($media)) return false;
 
+
 		$media = array_filter($media, function($medium){
 			return $medium['poster'] && !$medium['main'];
 		});
 
-		return (empty($media) OR count($media) == 1) ? false : true;
+		return (empty($media) OR count($media) == 0) ? false : true;
 	}
 
 	public function hasSupport($mode=NULL){
