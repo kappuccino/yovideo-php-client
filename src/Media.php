@@ -45,6 +45,8 @@ class Media{
 		if($this->size != 'full'){
 
 			$thumbnails = $this->media['thumbnails'];
+			if(!is_array($thumbnails)) return $this;
+
 			$thumbnails = array_filter($thumbnails, function ($t) {
 				return $t['name'] == $this->size;
 			});
