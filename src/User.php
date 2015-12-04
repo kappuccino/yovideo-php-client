@@ -81,7 +81,9 @@ class User extends Model{
 				$Crypto->key($config['salt']);
 
 				$crypted = $Crypto->encrypt($data['auth']['_id']);
-				setcookie('yau', $Crypto->iv().'__'.$crypted, time() + (15*86400), '/');
+				$cookie = base64_encode($Crypto->iv().'__'.$crypted);
+
+				setcookie('yau', $cookie, time() + (15*86400), '/');
 			}
 		}else{
 			self::logout();
@@ -435,22 +437,33 @@ class User extends Model{
 		$cookie = $_COOKIE['yau'];
 		if(!empty($cookie)){
 
+			$cookie = base64_decode($cookie);
+			if($cookie === false) return false; // Base64 failed;
+
 			$config = Config::get();
-			$Crypto = new Crypto();
+			$Crypto = new Crypto($config['salt']);
 
 			list($iv, $crypted) = explode('__', $cookie);
-
-			$Crypto->key($config['salt']);
 			$Crypto->iv($iv);
 
+		#	var_dump($Crypto->key());
+		#	var_dump($Crypto->iv());
+		#	var_dump($crypted);
+
 			$decode = $Crypto->decrypt($crypted);
+		#	var_dump($decode);
+		#	die();
+			if($decode === false) return false; // Erreur de decryptage
 
-			$User = new User();
-			$User->connectFromToken($decode);
-
-			if($_SESSION['yo']['auth']['_id'] == $decode){
-				return true;
+			try{
+				$User = new User();
+				$User->connectFromToken($decode);
+			}catch(Exception $e){
+				// silentio
 			}
+
+			// Si l'AUTH distante a le même ID que mon Cookie décodé (tout va bien)
+			if($_SESSION['yo']['auth']['_id'] == $decode) return true;
 		}
 
 		return false;
