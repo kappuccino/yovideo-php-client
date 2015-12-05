@@ -462,9 +462,21 @@ class Film extends Model{
 		if(empty($support)) return false;
 
 		usort($support, function($a, $b){
-			$a = new \DateTime($a['date']);
-			$b = new \DateTime($b['date']);
-			return $a->getTimestamp() > $b->getTimestamp();
+			try{
+				$a = new \DateTime($a['date']);
+				$a = $a->getTimestamp();
+			} catch(\Exception $e){
+				$a = '';
+			}
+
+			try{
+				$b = new \DateTime($b['date']);
+				$b = $b->getTimestamp();
+			} catch(\Exception $e){
+				$b = '';
+			}
+
+			return $a > $b;
 		});
 
 		$support = array_values($support);
