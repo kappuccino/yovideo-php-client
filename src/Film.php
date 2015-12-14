@@ -186,7 +186,7 @@ class Film extends Model{
 	}
 
 	public function formatTitle($title){
-		$title = str_replace(['<BR>', '<br>'], ' ', $title);
+		$title = str_replace(['<BR>', '<br>', '<br />', '<br/>'], ' + ', $title);
 		return $title;
 	}
 
