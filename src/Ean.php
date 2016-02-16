@@ -21,7 +21,7 @@ class Ean extends Model{
 		}
 
 		$data = $result['data'];
-		$this->setTotal(intval($result['total']));
+		$this->setTotal($result['total']);
 
 		foreach($data as $n => $e){
 			$data[$n] = new Ean($e);

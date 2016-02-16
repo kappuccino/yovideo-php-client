@@ -457,7 +457,15 @@ class Edition{
 	}
 
 	public function all(){
-		return $this->data;
+
+		$data = $this->data;
+
+		usort($data, function($a, $b){
+			if($a['name'] == $b['name']) return 0;
+			return $a['name'] > $b['name'] ? 1 : -1;
+		});
+
+		return $data;
 	}
 
 	public function getByID($id){
