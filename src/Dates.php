@@ -12,26 +12,26 @@ class Dates extends Model{
 		$this->set(NULL);
 	}
 
-	public function search($language, $from, $to, $mode=NULL){
+	public function search($language, $from, $to, $mode=NULL, $limit=NULL){
 
-		$url  = '/dates/'.$language;
-		$get  = ['from' => $from, 'to' => $to];
+		$url = '/dates/'.$language;
+		$post = ['from' => $from, 'to' => $to, 'limit' => $limit];
 
-		if($mode) $url  = '/dates/'.$mode.'/'.$language;
+		if($mode) $url = '/dates/'.$mode.'/'.$language;
 
 		try{
-			$results = $this->request->get($url, $get);
+			$results = $this->request->post($url, $post);
 		} catch(Exception $e){
 			throw $e;
 		}
 
 		// weight sort
-		if(!empty($results)){
+		/*if(!empty($results)){
 			usort($results, function($a, $b){
 				if($a['weight'] == $b['weight']) return 0;
 				return $a['weight'] > $b['weight'] ? -1 : 1;
 			});
-		}
+		}*/
 
 		if($mode){
 			$out = [];

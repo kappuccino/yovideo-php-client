@@ -15,6 +15,7 @@ class Request{
 	private $auth;
 	private $ttl;
 	private $debug;
+	private $cachable = false;
 	private $useCache = false;
 	private $defaultTTL = 86400; // 1j par défaut
 
@@ -71,9 +72,12 @@ class Request{
 		$out = false;
 		$cacheKey = $this->cacheMakeKey($url, $options);
 
+		if($this->useCache()) $this->isCachable(true);
+
 		if($this->debug()){
 			Tools::pre(
 				'>> '.strtoupper($verb).' '.$url, $opt,
+				'isCachable() = '.var_export($this->isCachable(), true),
 				'useCache() = '.var_export($this->useCache(), true),
 				'cacheKey = '.$cacheKey
 			);
@@ -92,9 +96,9 @@ class Request{
 			if($this->debug()) Tools::pre('NOT IN CACHE, the request will be triggered');
 
 			// Si je dois faire le travail
-			try {
+			try{
 				$data = $this->rest->$verb($url, $options);
-			} catch (\Exception $e) {
+			} catch (\Exception $e){
 				throw $e;
 			}
 
@@ -102,7 +106,7 @@ class Request{
 			$out  = $data->getBody();
 
 			// JSON ?
-			if (strpos($data->getHeader('content-type'), 'application/json') !== false){
+			if(strpos($data->getHeader('content-type'), 'application/json') !== false){
 				$out = $data->json();
 			}
 
@@ -114,7 +118,7 @@ class Request{
 				throw new Exception('Api Exception', $code);
 			}
 
-			if($code == 200 && $this->useCache()){
+			if($code == 200){
 				$cached = $this->cacheSerialize($out);
 
 				if($this->debug()){
@@ -125,11 +129,12 @@ class Request{
 					);
 				}
 
-				wp_cache_set($cacheKey, $cached, 'yoapi', $this->cacheTTL());
-
-				if($this->debug()) Tools::pre('CACHED in '.(microtime(true) - $now).' ms');
-			}else{
-				if($this->debug()) Tools::pre('NOT CACHED because useCache() is false');
+				if($this->isCachable()){
+					wp_cache_set($cacheKey, $cached, 'yoapi', $this->cacheTTL());
+					if($this->debug()) Tools::pre('CACHED in '.(microtime(true) - $now).' ms');
+				}else{
+					if($this->debug()) Tools::pre('NOT CACHED because isCachable() is false');
+				}
 			}
 
 		}else{
@@ -219,12 +224,16 @@ class Request{
 	#	return md5($url).'_'.crc32(json_encode($options));
 	}
 
+	public function isCachable($cachable=false){
+		if(func_num_args() == 0) return $this->cachable;
+		$this->cachable = (bool) $cachable;
+		return $this;
+	}
+
 	public function useCache($use=NULL, $ttl=false){
 		if(func_num_args() == 0) return $this->useCache;
 		$this->useCache = (bool) $use;
-
 		if($ttl) $this->cacheTTL($ttl);
-
 	#	Tools::pre('set cache to ', var_export($this->useCache, true));
 		return $this;
 	}
@@ -234,6 +243,7 @@ class Request{
 		$this->ttl = $ttl;
 		return $this;
 	}
+
 
 //--
 

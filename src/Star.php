@@ -76,6 +76,13 @@ class Star extends Model{
 		}
 
 		if(!empty($data)){
+
+			// Trier par date
+			usort($data, function($a, $b){
+				if($a['date'] == $b['date']) return 0;
+				return $a['date'] < $b['date'] ? 1 : -1;
+			});
+
 			foreach($data as $n => $e){
 
 				// Isoler les images de tournage ou il n'y a que cet acteur
@@ -461,7 +468,8 @@ class Star extends Model{
 		return implode(' ', $out);
 	}
 
-	public function getScored($ids){
+
+	/*public function getScored($ids){
 
 		// Demander le SCORE pour toute ces Stars
 		try {
@@ -479,5 +487,5 @@ class Star extends Model{
 		});
 
 		return $Result;
-	}
+	}*/
 }

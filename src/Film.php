@@ -179,7 +179,6 @@ class Film extends Model{
 			throw $e;
 		}
 
-
 		if(!empty($data)){
 
 			// Film Object
@@ -713,16 +712,22 @@ class Film extends Model{
 	}
 
 	public function opengraphMeta(){
-/*
-<meta property="og:locale" content="fr_FR" />
-<meta property="og:type" content="article" />
-<meta property="og:title" content="Blabla titre Facebook" />
-<meta property="og:description" content="qsdqsd" />
-<meta property="og:url" content="http://dev.metiers-presse.org/connaitre-letendue-du-secteur/" />
-<meta property="og:site_name" content="Métiers Presse" />
-*/
 
-		return [];
+		$resume = strip_tags($this->resume());
+		$desc = substr($resume, 0, 200);
+		if(strlen($resume) > 200) $desc .= '...';
+
+		$out = [
+			'og:title' => $this->displayTitle(),
+			'og:type' => 'video.movie',
+			'og:url' => $this->permalink(true),
+			'og:description' => $desc
+		];
+
+		$img = $this->jaquetteURL('small', FILM_FALLBACK);
+		if($img != FILM_FALLBACK) $out['og:image'] = $img;
+
+		return $out;
 	}
 
 	public function twitterMeta(){
@@ -734,5 +739,36 @@ class Film extends Model{
 */
 
 		return [];
+	}
+
+	public function supportCount(){
+		$support = array_filter($this->get('support'), function($s){
+			return $s['mode'] != 'cine';
+		});
+
+		return count($support);
+	}
+
+	public function photoCount(){
+
+		$media = $this->get('media');
+		if(empty($media)) return 0;
+
+		$media = array_filter($media, function($medium){
+			return $medium['onset'];
+		});
+
+		return count($media);
+	}
+
+	public function castingCount(){
+		$total = 0;
+
+		foreach(\YoVideo\YoVideo::getPeople() as $p){
+			$tmp = $this->get($p);
+			if(!empty($tmp)) $total += count($tmp);
+		}
+
+		return $total;
 	}
 }

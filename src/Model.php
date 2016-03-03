@@ -269,6 +269,13 @@ class Model extends YoVideo{
 		echo $html;
 	}
 
+	public function isCachable($cachable){
+		if(func_num_args() == 0) return $this->request->isCachable();
+		$this->request->isCachable((bool) $cachable);
+		return $this;
+
+	}
+
 	public function useCache($use=NULL, $ttl=NULL){
 		if(func_num_args() == 0) return $this->request->useCache();
 		$this->request->useCache((bool) $use);
@@ -277,13 +284,15 @@ class Model extends YoVideo{
 	}
 
 	public function cacheTTL($ttl=NULL){
-		if(func_num_args()) return $this->request->cacheTTL();
+		if(func_num_args() == 0) return $this->request->cacheTTL();
 		$this->request->cacheTTL($ttl);
 		return $this;
 	}
 
 	public function requestDebug($debug=NULL){
-		return $this->request->debug($debug);
+		if(func_num_args() == 0) return $this->request->debug();
+		$this->request->debug($debug);
+		return $this;
 	}
 
 	public function statsCount($stat){
