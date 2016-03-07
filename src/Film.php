@@ -532,6 +532,14 @@ class Film extends Model{
 		return false;
 	}
 
+	public function shortResume($lim=200){
+		$resume = strip_tags($this->resume());
+		$desc = substr($resume, 0, $lim);
+		if(strlen($resume) > $lim) $desc .= '...';
+
+		return $desc;
+	}
+
 	/**
 	 * Retourne une ou plusieurs Star d'après le job
 	 * Permet d'avoir facilement le premier réalisateur, ou les 3 premiers acteurs
@@ -713,15 +721,11 @@ class Film extends Model{
 
 	public function opengraphMeta(){
 
-		$resume = strip_tags($this->resume());
-		$desc = substr($resume, 0, 200);
-		if(strlen($resume) > 200) $desc .= '...';
-
 		$out = [
 			'og:title' => $this->displayTitle(),
 			'og:type' => 'video.movie',
 			'og:url' => $this->permalink(true),
-			'og:description' => $desc
+			'og:description' => $this->shortResume(200)
 		];
 
 		$img = $this->jaquetteURL('small', FILM_FALLBACK);
