@@ -425,7 +425,7 @@ class Film extends Model{
 				// silence
 			}
 
-			if($e['language'] == $language && $e['mode'] == $mode && $time >= $from && $to <= $to){
+			if($e['language'] == $language && $e['mode'] == $mode && $time >= $from && $time <= $to){
 				$times[$time] = $e;
 			}
 		}
@@ -434,7 +434,7 @@ class Film extends Model{
 		sort($times);
 		$time = $times[0];
 
-		// Noter le numéro de la semaien au passage
+		// Noter le numéro de la semaine au passage
 		list($y, $m, $d) = explode('-', $time['date']);
 
 	#	pre($this->getId(), $support, $time, $y, $m, $d, $times);
