@@ -597,7 +597,8 @@ class Film extends Model{
 		$helper = new Genre();
 		foreach($genres as $g){
 			$g = $helper->getByCode($g);
-			$out[] = '<a href="/fr/search/film/?genre="'.$g['code'].'>'.$g['name'].'</a>';
+			$out[] = '<meta itemprop="genre">'.$g['name'].'</meta>';
+			#$out[] = '<a href="/fr/search/film/?genre="'.$g['code'].'>'.$meta.'</a>';
 		}
 
 		return $out;
@@ -611,7 +612,8 @@ class Film extends Model{
 		$helper = new TypeFilm();
 		foreach($types as $t){
 			$t = $helper->getByCode($t);
-			$out[] = '<a href="/fr/search/film/?type="'.$t['code'].'"">'.$t['name'].'</a>';
+			$out[] = '<meta itemprop="genre">'.$t['name'].'</meta>';
+			#$out[] = '<a href="/fr/search/film/?type="'.$t['code'].'">'.$meta.'</a>';
 		}
 
 		return $out;

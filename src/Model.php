@@ -252,12 +252,17 @@ class Model extends YoVideo{
 		$html = [];
 		$tags = ['href' => $url];
 
-		foreach(['target', 'title', 'alt', 'class', 'id'] as $t){
+		foreach(['target', 'title', 'alt', 'class', 'id', 'itemscope', 'itemtype', 'itemprop'] as $t){
 			if($opt[$t]) $tags[$t] = $opt[$t];
 		}
 
 		foreach($tags as $tag => $val){
-			$html[] = $tag.'="'.addslashes($val).'"';
+			if($val == '__NULL__'){
+				$val = NULL;
+			}else{
+				$val = '="'.addslashes($val).'"';
+			}
+			$html[] = $tag.$val;
 		}
 
 		$start = ' '.implode(' ', $html);

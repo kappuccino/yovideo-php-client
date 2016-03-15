@@ -210,10 +210,14 @@ class Star extends Model{
 	 */
 	public function htmlLink($label=NULL, $url=NULL, $opt=[]){
 
-		if(empty($label)) $label = $this->get('name');
+		if(empty($label)) $label = $this->displayName();
+
+		$label = '<span itemprop="name">'.$label.'</span>';
 
 		$opt = array_merge($opt, [
-			'title' => $this->displayName()
+			'title' => $this->displayName(),
+			'itemscope' => '__NULL__',
+			'itemtype' => 'http://schema.org/Person'
 		]);
 
 		return parent::htmlLink($label, $url ?: $this->permalink(true), $opt);
