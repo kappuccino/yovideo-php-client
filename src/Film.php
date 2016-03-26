@@ -477,11 +477,17 @@ class Film extends Model{
 
 			return $a > $b;
 		});
-
+		
 		$support = array_values($support);
 		$support = $support[0];
 
-		$support['date_human'] = Tools::date('%e %B %Y', $support['date']);
+		try{
+			$date = Tools::date('%e %B %Y', $support['date']);
+		} catch (\Exception $e){
+			return false;
+		}
+
+		$support['date_human'] = $date;
 
 		return $support;
 	}
