@@ -76,6 +76,22 @@ class Search extends Model{
 		return $this;
 	}
 
+
+	public function faced(Array $post){
+
+		$url = '/search/faced';
+
+		try{
+			$result = $this->request->post($url, $post);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+		$this->set($result);
+
+		return $this;
+	}
+
 	//--
 
 	function matchSupport(){
