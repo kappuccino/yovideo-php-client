@@ -24,16 +24,12 @@ class Affilinet{
 			]
 		];
 
-	#	pre($options);
-
 		$this->rest = new Client($options);
 	}
 
 	private function request($verb, $url, $opt=array()){
 
 		$options = array_merge(['exceptions' => false], $opt);
-
-	#	pre($url);
 
 		try {
 			$data = $this->rest->$verb($url, $options);
@@ -72,7 +68,7 @@ class Affilinet{
 		if($program) $data['program'] = $program;
 
 		try{
-			$result = $this->post('/ean', $data);
+			$result = $this->post('/api/ean', $data);
 		} catch(Exception $e){
 			throw $e;
 		}
