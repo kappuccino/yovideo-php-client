@@ -479,4 +479,12 @@ class Edition{
 		return $data[0];
 	}
 
+	static function title($support){
+	#	pre($support['types'], $support['edition']);
+
+		$types = implode(' + ', $support['types']);
+		if(!empty($types)) $types .= ' ';
+
+		return $types . $support['edition'];
+	}
 }
