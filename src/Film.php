@@ -262,7 +262,7 @@ class Film extends Model{
 		return $this->htmlLink($label, $url, $opt);
 	}
 
-	public function jaquetteURL($size='small', $fallback=false){
+	public function jaquetteURL($size='small', $fallback=false, $returnMedia=false){
 
 		$media = $this->get('media');
 		if(empty($media)) return $fallback;
@@ -279,6 +279,8 @@ class Film extends Model{
 		$image = new Media($media[0]);
 		$image->fallback($fallback);
 		$image->size($size);
+
+		if($returnMedia) return $image;
 
 		return $image->url();
 	}
