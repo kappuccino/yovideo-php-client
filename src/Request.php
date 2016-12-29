@@ -40,13 +40,11 @@ class Request{
 	 */
 	private function rest(){
 		$client = new Client([
-			'base_url' => $this->serverUrl,
-			'defaults' => [
-				'timeout' => 60,
-				'headers' => [
-					'Accept' => 'application/json',
-					'Auth'   => $this->auth
-				]
+			'base_uri' => $this->serverUrl,
+			'timeout' => 60,
+			'headers' => [
+				'Accept' => 'application/json',
+				'Auth'   => $this->auth
 			]
 		]);
 
@@ -58,17 +56,30 @@ class Request{
 	 *
 	 * @param string $verb (get, post, put, delete)
 	 * @param string $url
-	 * @param array  $opt (request options);
+	 * @param array  $params
+	 * @param array  $options
 	 * @return array|\GuzzleHttp\Stream\StreamInterface|null|string
-	 * @throws Exception
 	 * @throws \Exception
+	 * @throws \YoVideo\Exception
+	 * @internal param array $opt (request options);
 	 */
-	private function request($verb, $url, $opt=array()){
+	private function request($verb, $url, Array $params=[], Array $options=[]){
 
 		$now = microtime(true);
 		$url = '/'.$this->version.$url;
-		$options = ['exceptions' => false];
-		$options = array_merge($options, $opt);
+		$options = $options + ['exceptions' => false];
+		if(!empty($params)) $options = $options + ['form_params' => $params];
+
+		if(!empty($options['headers'])  &&  $options['headers']['Content-Type'] == 'application/json'){
+			$options['json'] = $options['form_params'];
+			unset($options['form_params']);
+
+			#	print_r($options);
+			#	die();
+		}
+
+
+
 		$out = false;
 		$cacheKey = $this->cacheMakeKey($url, $options);
 
@@ -76,14 +87,13 @@ class Request{
 
 		if($this->debug()){
 			Tools::pre(
-				'>> '.strtoupper($verb).' '.$url, $opt,
+				'>> '.strtoupper($verb).' '.$url, $params, $options,
 				'isCachable() = '.var_export($this->isCachable(), true),
 				'useCache() = '.var_export($this->useCache(), true),
 				'cacheKey = '.$cacheKey
 			);
+			Tools::pre('Memory (before) = '.Tools::memoryUsage());
 		}
-
-		if($this->debug()) Tools::pre('Memory (before) = '.Tools::memoryUsage());
 
 		// Si l'on veut de la cache, on la demande a WP (redis)
 		if($this->useCache()){
@@ -97,22 +107,31 @@ class Request{
 
 			// Si je dois faire le travail
 			try{
-				$data = $this->rest->$verb($url, $options);
+			#	pre($verb, $url, $options);
+				$data = $this->rest->request($verb, $url, $options);
 			} catch (\Exception $e){
 				throw $e;
 			}
 
+			// http://docs.guzzlephp.org/en/latest/quickstart.html#making-a-request
 			$code = $data->getStatusCode();
-			$out  = $data->getBody();
+			$body = $data->getBody();
+			$out  = $body->getContents();
 
 			// JSON ?
 			if(strpos($data->getHeader('content-type'), 'application/json') !== false){
-				$out = $data->json();
+				try{
+					$out = json_decode($out, true);
+				} catch (\Exception $e){
+				}
 			}
 
 			if($code > 200){
 				if(is_array($out) && NULL !== $out['error']['name']){
 					throw new Exception($out['error'], $code);
+				}else
+				if(is_array($out)){
+					throw new Exception(['name' => 'Error', 'remote' => $out]);
 				}
 
 				throw new Exception('Api Exception', $code);
@@ -149,6 +168,131 @@ class Request{
 		return $out;
 	}
 
+
+
+	/**
+	 * Envois une requete via le Client REST, retourne un ARRAY si le résultat est du JSON, si non, RAW
+	 *
+	 * @param string $verb (get, post, put, delete)
+	 * @param string $url
+	 * @param array  $opt (request options);
+	 * @return array|\GuzzleHttp\Stream\StreamInterface|null|string
+	 * @throws Exception
+	 * @throws \Exception
+	 */
+	private function request_____($verb, $url, Array $params=[], Array $options=[]){
+
+		$now = microtime(true);
+		$options = $options + ['exceptions' => false];
+		if(!empty($params)) $options = $options + ['form_params' => $params];
+
+		if(!empty($options['headers'])  &&  $options['headers']['Content-Type'] == 'application/json'){
+			$options['json'] = $options['form_params'];
+			unset($options['form_params']);
+
+			#	print_r($options);
+			#	die();
+		}
+
+
+
+		$out = false;
+		$cacheKey = $this->cacheMakeKey($url, $params);
+
+		if($this->debug()){
+			Tools::pre(
+					'>> '.strtoupper($verb).' '.$this->serverUrl.$url,
+					'Request parameter', $options,
+					'useCache() = '.var_export($this->useCache(), true),
+					'cacheKey = '.$cacheKey
+			);
+			Tools::pre('Memory (before) = '.Tools::memoryUsage());
+		}
+
+		// Si l'on veut de la cache, on la demande a WP (redis)
+		if($this->useCache()){
+			$cached = wp_cache_get($cacheKey, 'yoapi');
+			if($cached !== false) $out = $this->cacheUnserialize($cached);
+		}
+
+		if(empty($out)){
+
+			if($this->debug()) Tools::pre('NOT IN CACHE, the request will be triggered');
+
+			// Si je dois faire le travail
+			try {
+				$data = $this->rest->request($verb, $url, $options);
+			} catch (\Exception $e) {
+				throw $e;
+			}
+
+			if($this->debug()){
+				#	Tools::pre($data->getStatusCode());
+				#	Tools::pre($data->getHeaders());
+				#	Tools::pre($data->getBody()->getContents());
+				#	die('!!!hjkfdezjgfzegfgkfekz');
+			}
+
+			// http://docs.guzzlephp.org/en/latest/quickstart.html#making-a-request
+			$code = $data->getStatusCode();
+			$body = $data->getBody();
+			$out  = $body->getContents();
+
+			// JSON ?
+			if (strpos($data->getHeader('content-type'), 'application/json') !== false){
+				try{
+					$out = json_decode($out, true);
+				} catch (\Exception $e){
+				}
+			}
+
+			#if($this->debug()) Tools::pre($out);
+
+			if($code > 200){
+				if(is_array($out) && NULL !== $out['error']['name']){
+					throw new Exception($out, $code);
+				}else
+					if(is_array($out)){
+						throw new Exception(['name' => 'Error', 'remote' => $out]);
+					}
+
+				throw new Exception('Api Exception', $code);
+			}
+
+			if($code == 200 && $this->useCache()){
+				$cached = $this->cacheSerialize($out);
+
+				if($this->debug()){
+					Tools::pre(
+							'now= '.date("Y-m-d H:i:s"),
+							'ttl= '.$this->cacheTTL(),
+							'date= '.date("Y-m-d H:i:s", time()+$this->cacheTTL())
+					);
+				}
+
+				wp_cache_set($cacheKey, $cached, 'yoapi', $this->cacheTTL());
+
+				if($this->debug()) Tools::pre('CACHED in '.(microtime(true) - $now).' ms');
+			}else{
+				if($this->debug()) Tools::pre('NOT CACHED because useCache() is false');
+			}
+
+		}else{
+			if($this->debug()) Tools::pre('CACHE HITED in '.(microtime(true)-$now).' ms');
+		}
+
+		if($this->debug()){
+			Tools::pre('Memory (after) = '.Tools::memoryUsage());
+			Tools::pre('Timing is '.(microtime(true)-$now));
+		}
+
+		return $out;
+	}
+
+
+
+
+
 	/**
 	 * GET
 	 *
@@ -159,7 +303,7 @@ class Request{
 	 */
 	public function get($url, $params=NULL, $options=array()){
 		if($params) $url .= '?'.http_build_query($params);
-		return $this->request('get', $url, $options);
+		return $this->request('get', $url, [], $options);
 	}
 
 	/**
@@ -172,13 +316,14 @@ class Request{
 	 * @return array|\GuzzleHttp\Stream\StreamInterface|null|string
 	 */
 	public function post($url, Array $data = [], Array $options = []){
-		$opt = ['body' => $data];
+		return $this->request('post', $url, $data, $options);
+		/*$opt = ['body' => $data];
 		if(!empty($options)) $opt = $opt + $options;
 
 	#	pre($url, $opt);
 	#	die();
 
-		return $this->request('post', $url, $opt);
+		return $this->request('post', $url, $opt);*/
 	}
 
 	/**
@@ -189,8 +334,9 @@ class Request{
 	 *
 	 * @return array|\GuzzleHttp\Stream\StreamInterface|null|string
 	 */
-	public function put($url, Array $data){
-		return $this->request('put', $url, ['body' => $data]);
+	public function put($url, Array $data, Array $options = []){
+		//return $this->request('put', $url, ['body' => $data]);
+		return $this->request('put', $url, $data, $options);
 	}
 
 	/**
@@ -201,11 +347,50 @@ class Request{
 	 *
 	 * @return array|\GuzzleHttp\Stream\StreamInterface|null|string
 	 */
-	public function delete($url, $data=NULL){
+	/*public function delete($url, $data=NULL){
 		$opt = [];
 		if(!empty($data)) $opt = ['body' => $data];
 
 		return $this->request('delete', $url, $opt);
+	}*/
+
+	public function delete($url, Array $data = [], Array $options = []){
+		return $this->request('delete', $url, $data, $options);
+	}
+
+//--
+
+	/**
+	 * GRAPHQL
+	 *
+	 * @param $query
+	 * @param $variables
+	 *
+	 * @return array|\GuzzleHttp\Stream\StreamInterface|null|string
+	 */
+	public function graphql($query, Array $variables=[]){
+
+		$post = [
+			'query' => $query,
+			'variables' => $variables
+		];
+
+		$options = [
+			'headers' => [
+				'Content-Type' => 'application/json',
+				'Accept' => 'application/json'
+			]
+		];
+
+		$data = [];
+
+		try{
+			$data = $this->post('/graphql', $post, $options);
+		} catch (Exception $e){
+			print_r($e); // affiche la trace pour aider a voir l'erreur
+		}
+
+		return $data['data'];
 	}
 
 //--

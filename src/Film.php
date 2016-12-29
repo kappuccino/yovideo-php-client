@@ -416,7 +416,6 @@ class Film extends Model{
 		$to = is_a($to, 'DateTime') ? $to : new \DateTime($to);
 		$to = $to->getTimestamp();
 
-
 		foreach($support as $e){
 			$time = 0;
 
@@ -439,7 +438,7 @@ class Film extends Model{
 		// Noter le numéro de la semaine au passage
 		list($y, $m, $d) = explode('-', $time['date']);
 
-	#	pre($this->getId(), $support, $time, $y, $m, $d, $times);
+		//pre($this->getId(), $support, $time, $y, $m, $d, $times);
 
 		$time['week'] = date("Y-W", mktime(0,0,0, $m, $d, $y));
 		$this->set('support_nearest_date', $time, false);

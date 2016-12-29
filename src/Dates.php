@@ -60,6 +60,91 @@ class Dates extends Model{
 		return $this;
 	}
 
+	public function searchQL($language, $from, $to, $mode=NULL, $limit=NULL){
+
+		$template =
+		'filmByDate(mode:"%mode%", language:$language, from:$from, to:$to, limit:$limit){
+			_id
+			title
+			locale(language:$language){
+				title
+			}
+			director{
+				_id
+				name
+			}
+			support(mode:"%mode%"){ # mode + language utilisé par Film::nearestDate()
+				mode
+				language    
+				date
+				date_
+			}
+			media(main:true, poster:true){
+				url
+				main
+				poster
+				thumbnails{
+					etag
+					name
+					height
+					width
+					url
+				}
+			}
+		}';
+
+		$requests = '';
+		foreach($mode as $m){
+			 $requests .= PHP_EOL.$m.': '.str_replace('%mode%', $m, $template).PHP_EOL;
+		}
+
+		$query = 'query filmByDate($language:String, $from:String, $to:String, $limit:Int){'.
+			$requests.
+		'}';
+
+		try{
+			$results = $this->request->graphql($query,
+			[
+				'language' => $language,
+				'from' => $from,
+				'to' => $to,
+				'limit' => $limit
+			]);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+	#	pre($query);
+	#	pre($results);
+	#	die();
+
+		// weight sort
+		/*if(!empty($results)){
+			usort($results, function($a, $b){
+				if($a['weight'] == $b['weight']) return 0;
+				return $a['weight'] > $b['weight'] ? -1 : 1;
+			});
+		}*/
+
+	#	pre($results);
+	#	die();
+
+		foreach($results as $k => $res){
+			foreach($res as $n => $r){
+				$film = new Film($r);
+				$film->nearestDate('fr', $k, $from, $to);
+				$out[$k][$n] = $film;
+			}
+		}
+
+		#pre($out);
+		#die();
+
+		$this->set($out);
+
+		return $this;
+	}
+
 // HELPERS /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public function previousWednesday(){

@@ -97,7 +97,7 @@ class Media{
 	public function url(){
 		if(empty($this->url) OR $this->notFound) return $this->default;
 
-		$domain = (function_exists('kapp_onair') && kapp_onair())
+		$domain = (function_exists('yoCloudfront') && yoCloudfront())
 			? $this->cloudfront
 			: $this->bucket;
 
