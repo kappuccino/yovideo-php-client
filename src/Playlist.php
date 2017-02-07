@@ -218,7 +218,7 @@ class Playlist extends Model{
 
 	public function permalink($full=false){
 		$url = '/fr/playlist/'.$this->getId().'/';
-		if($full) $url = 'http://'.$_SERVER['HTTP_HOST'].$url;
+		if($full) $url = self::domain().$url;
 		return $url;
 	}
 
@@ -228,7 +228,7 @@ class Playlist extends Model{
 
 	public function publicPermalink($full=false){
 		$url = '/fr/member/'.$this->get('_user._id').'/playlist/'.$this->getId().'/';
-		if($full) $url = 'http://'.$_SERVER['HTTP_HOST'].$url;
+		if($full) $url = self::domain().$url;
 		return $url;
 	}
 

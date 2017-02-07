@@ -34,4 +34,19 @@ class YoVideo{
 
 		}
 	}
+
+	public static function domain(){
+
+		$scheme = 'http';
+
+		if(isset($_SERVER['REQUEST_SCHEME'])){
+			$scheme = $_SERVER['REQUEST_SCHEME'];
+		}else
+		if($_SERVER['HTTPS'] === 'on'){
+			$scheme = 'https';
+		}
+
+		return $scheme.'://'.$_SERVER['HTTP_HOST'];
+
+	}
 }

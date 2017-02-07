@@ -237,7 +237,7 @@ class Film extends Model{
 	 */
 	public function permalink($full=false){
 		$url = '/fr/film/'.$this->getId().'/';
-		if($full) $url = 'http://'.$_SERVER['HTTP_HOST'].$url;
+		if($full) $url = self::domain().$url;
 		return $url;
 	}
 
@@ -399,7 +399,7 @@ class Film extends Model{
 		$media = array_values($media);
 
 		$config = Config::get();
-		$bucket = 'http://'.$config['aws']['s3']['bucket'].'/';
+		$bucket = '//'.$config['aws']['s3']['bucket'].'/';
 		$url = $bucket.$media[0]['url'];
 
 		return $url;

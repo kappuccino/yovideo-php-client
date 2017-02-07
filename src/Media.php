@@ -105,7 +105,7 @@ class Media{
 			? '?etag='.$this->etag
 			: NULL;
 
-		return 'http://'.$domain.'/'.$this->url.$etag;
+		return '//'.$domain.'/'.$this->url.$etag;
 	}
 
 	public function html($return=false){
@@ -145,7 +145,7 @@ class Media{
 		$request = new Request();
 
 		$opt = [
-			'url'  => 'http://' . $_SERVER['HTTP_HOST'] . $this->media,
+			'url'  => '//' . $_SERVER['HTTP_HOST'] . $this->media,
 			'type' => $type,
 			'_id'  => $_id,
 			'file' => $file

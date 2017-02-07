@@ -181,8 +181,7 @@ class User extends Model{
 
 		$config = Config::get();
 		$sent = false;
-		$link = 'http://'.$_SERVER['HTTP_HOST'].'/fr/user/confirm/'.
-				'?email='.rawurlencode($email).'&name='.$name;
+		$link = self::domain().'/fr/user/confirm/?email='.rawurlencode($email).'&name='.$name;
 
 		try {
 			$mandrill = new \Mandrill($config['mandrill']['key']);
@@ -233,7 +232,7 @@ class User extends Model{
 
 		$config = Config::get();
 		$sent = false;
-		$link = 'http://'.$_SERVER['HTTP_HOST'].'/fr/user/lost/?token='.rawurlencode($token);
+		$link = self::domain().'/fr/user/lost/?token='.rawurlencode($token);
 
 		try {
 			$mandrill = new \Mandrill($config['mandrill']['key']);
@@ -514,7 +513,7 @@ class User extends Model{
 	 */
 	public function permalink($full=false){
 		$url = '/fr/member/'.$this->getId().'/';
-		if($full) $url = 'http://'.$_SERVER['HTTP_HOST'].$url;
+		if($full) $url = self::domain().$url;
 		return $url;
 	}
 
