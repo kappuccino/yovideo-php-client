@@ -145,7 +145,7 @@ class Media{
 		$request = new Request();
 
 		$opt = [
-			'url'  => '//' . $_SERVER['HTTP_HOST'] . $this->media,
+			'url'  => 'http://' . $_SERVER['HTTP_HOST'] . $this->media,
 			'type' => $type,
 			'_id'  => $_id,
 			'file' => $file
