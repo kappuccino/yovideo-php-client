@@ -53,7 +53,7 @@ class Ean extends Model{
 
 
 	public function permalink($full=false){
-		$url = '/fr/ean13/'.$this->get('ean').'/';
+		$url = '/fr/ean13/'.$this->get('_id').'/';
 		if($full) $url = self::domain().$url;
 		return $url;
 	}
