@@ -66,7 +66,10 @@ class Dates extends Model{
 		'filmByDate(mode:"%mode%", language:$language, from:$from, to:$to, limit:$limit){
 			_id
 			title
+			weight
+			
 			locale(language:$language){
+				language
 				title
 			}
 			director{
@@ -136,6 +139,91 @@ class Dates extends Model{
 				$out[$k][$n] = $film;
 			}
 		}
+
+		#pre($out);
+		#die();
+
+		$this->set($out);
+
+		return $this;
+	}
+
+	public function searchCineActorQL($language, $from, $to, $limit=NULL){
+
+		$query = 'query filmByDate($language:String, $from:String, $to:String, $limit:Int){
+			filmByDate(mode:"cine", language:$language, from:$from, to:$to, limit:$limit){
+				_id
+				title
+				weight
+				
+				locale(language:$language){
+					language
+					title
+				}
+
+				actor{
+					_id
+					name
+					media(main:true, poster:true){
+						etag
+						url
+						size
+						main
+						poster
+						thumbnails{
+							url
+							etag
+							name
+							height
+							width
+						}
+					}
+				}
+
+				support(mode:"cine"){ # mode + language utilisé par Film::nearestDate()
+					mode
+					language    
+					date
+					date_
+				}
+			}
+		}';
+
+		try{
+			$results = $this->request->graphql($query, [
+				'language' => $language,
+				'from' => $from,
+				'to' => $to,
+				'limit' => $limit
+			]);
+		} catch(Exception $e){
+			throw $e;
+		}
+
+	#	pre($query);
+	#	pre($results);
+	#	die();
+
+		// weight sort
+		/*if(!empty($results)){
+			usort($results, function($a, $b){
+				if($a['weight'] == $b['weight']) return 0;
+				return $a['weight'] > $b['weight'] ? -1 : 1;
+			});
+		}*/
+
+	#	pre($results);
+	#	die();
+
+		foreach($results as $k => $res){
+			foreach($res as $n => $r){
+				$film = new Film($r);
+				$film->nearestDate('fr', $k, $from, $to);
+				$out[$k][$n] = $film;
+			}
+		}
+
+		if(!empty($out['filmByDate'])) $out = $out['filmByDate'];
 
 		#pre($out);
 		#die();
