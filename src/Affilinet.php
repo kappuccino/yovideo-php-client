@@ -15,12 +15,10 @@ class Affilinet{
 
 		$config = Config::get();
 		$options = [
-			'base_url' => 'http://'.$config['host'].':'.$config['affilinet'],
-			'defaults' => [
-				'timeout' => 60,
-				'headers' => [
-					'Accept' => 'application/json',
-				]
+			'base_uri' => 'http://'.$config['host'].':'.$config['affilinet'],
+			'timeout' => 60,
+			'headers' => [
+				'Accept' => 'application/json'
 			]
 		];
 
@@ -42,7 +40,10 @@ class Affilinet{
 
 		// JSON ?
 		if(strpos($data->getHeader('content-type'), 'application/json') !== false){
-			$out = $data->json();
+			try{
+				$out = json_decode($out, true);
+			} catch (\Exception $e){
+			}
 		}
 
 		if($code > 200){
@@ -57,7 +58,7 @@ class Affilinet{
 	}
 
 	public function post($url, Array $data = [], Array $options = []){
-		$opt = ['body' => $data];
+		$opt = ['form_params' => $data];
 		if(!empty($options)) $opt = $opt + $options;
 		return $this->request('post', $url, $opt);
 	}
